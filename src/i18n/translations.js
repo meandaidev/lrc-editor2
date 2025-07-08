@@ -1,3 +1,4 @@
+
 import { useLanguage } from './LanguageContext'
 
 export const translations = {
@@ -104,7 +105,6 @@ export const translations = {
     save: "Save",
     edit: "Edit",
     delete: "Delete",
-    close: "Close",
     ok: "OK",
     yes: "Yes",
     no: "No",
@@ -133,22 +133,13 @@ export const translations = {
     finalizing: "Finalizing...",
     
     // Tooltips
-    resetToStart: "Reset to start",
-    playPause: "Play/Pause",
-    songMetadataTooltip: "Song metadata",
-    setStartTime: "Set start time",
-    setEndTime: "Set end time",
     playFromPrevious: "Play from previous line",
-    jumpToLine: "Jump to this line",
-    noStartTime: "No start time set",
-    jump: "Jump",
     resetConfirmMessage: "You have unsaved lyrics and timing data. Going back to the home page will lose all your work. Are you sure you want to continue?",
     backToHomeTooltip: "Back to home page",
     editText: "Edit text",
     insertAfter: "Insert line before",
     deleteLine: "Delete line",
-    subtract05: "Subtract 0.5s",
-    add05: "Add 0.5s",
+    
     exportLrcTooltip: "Export LRC file",
     exportZipTooltip: "Export complete package as ZIP",
     importLrcTooltip: "Import existing LRC file",
@@ -263,7 +254,6 @@ export const translations = {
     save: "บันทึก",
     edit: "แก้ไข",
     delete: "ลบ",
-    close: "ปิด",
     ok: "ตกลง",
     yes: "ใช่",
     no: "ไม่",
@@ -292,22 +282,13 @@ export const translations = {
     finalizing: "กำลังเสร็จสิ้น...",
     
     // Tooltips
-    resetToStart: "รีเซ็ตไปจุดเริ่มต้น",
-    playPause: "เล่น/หยุด",
-    songMetadataTooltip: "ข้อมูลเพลง",
-    setStartTime: "กำหนดเวลาเริ่ม",
-    setEndTime: "กำหนดเวลาสิ้นสุด",
     playFromPrevious: "เล่นจากบรรทัดก่อนหน้า",
-    jumpToLine: "กระโดดไปยังบรรทัดนี้",
-    noStartTime: "ยังไม่ได้ตั้งเวลาเริ่ม",
-    jump: "กระโดด",
     resetConfirmMessage: "คุณมีข้อมูลเนื้อเพลงและการจับเวลาที่ยังไม่ได้บันทึก การกลับไปหน้าแรกจะทำให้ข้อมูลทั้งหมดหายไป คุณแน่ใจหรือไม่ว่าต้องการดำเนินการต่อ?",
     backToHomeTooltip: "กลับไปหน้าแรก",
     editText: "แก้ไขข้อความ",
     insertAfter: "แทรกบรรทัดก่อนหน้า",
     deleteLine: "ลบบรรทัด",
-    subtract05: "ลด 0.5 วินาที",
-    add05: "เพิ่ม 0.5 วินาที",
+
     exportLrcTooltip: "ส่งออกไฟล์ LRC",
     exportZipTooltip: "ส่งออกแพ็คเกจทั้งหมดเป็น ZIP",
     importLrcTooltip: "นำเข้าไฟล์ LRC ที่มีอยู่",

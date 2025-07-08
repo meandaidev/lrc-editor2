@@ -1,6 +1,8 @@
 import { create } from 'zustand'
 
 const useLRCStore = create((set, get) => ({
+  // Modal skip state for alternate lyric entry flow
+  skipLyricsInputModalOnce: false,
   // File management
   audioFiles: {
     main: null,
@@ -40,6 +42,7 @@ const useLRCStore = create((set, get) => ({
   addLyricIndex: -1,
   
   // Actions
+  setSkipLyricsInputModalOnce: (val) => set({ skipLyricsInputModalOnce: val }),
   setAudioFiles: (files) => set({ audioFiles: files }),
   setPrefix: (prefix) => set({ prefix }),
   

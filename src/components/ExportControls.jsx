@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
-import { Download, Archive, Upload, FileText, Package } from 'lucide-react'
+import { useState } from 'react'
+import { Download, Archive, FileText, Package } from 'lucide-react'
 import JSZip from 'jszip'
 import useLRCStore from '../stores/lrcStore'
-import { generateLRCContent, downloadFile, parseLRCContent } from '../utils/lrcUtils'
+import { generateLRCContent, downloadFile } from '../utils/lrcUtils'
 import { useTranslation } from '../i18n/translations'
 
 const ExportControls = () => {
@@ -14,8 +14,8 @@ const ExportControls = () => {
     metadata,
     audioFiles,
     prefix,
-    setLyrics,
-    setMetadata
+    // setLyrics,
+    // setMetadata
   } = useLRCStore()
 
   const handleExportLRC = () => {
@@ -117,43 +117,7 @@ const ExportControls = () => {
     }
   }
 
-  const handleImportLRC = () => {
-    const input = document.createElement('input')
-    input.type = 'file'
-    input.accept = '.lrc'
-    input.onchange = async (e) => {
-      const file = e.target.files[0]
-      if (file) {
-        try {
-          const content = await file.text()
-          const { metadata: importedMetadata, lyrics: importedLyrics } = parseLRCContent(content)
-          
-          // Confirm before replacing
-          const confirmReplace = window.confirm(t('replaceConfirm'))
-          
-          if (confirmReplace) {
-            setLyrics(importedLyrics)
-            setMetadata({
-              title: importedMetadata.ti || '',
-              artist: importedMetadata.ar || '',
-              album: importedMetadata.al || '',
-              author: importedMetadata.au || '',
-              length: importedMetadata.length || '',
-              by: importedMetadata.by || 'LRC Editor v1.0',
-              offset: parseInt(importedMetadata.offset) || 0,
-              re: importedMetadata.re || 'LRC Editor',
-              ve: importedMetadata.ve || '1.0'
-            })
-            alert(t('importSuccess'))
-          }
-        } catch (error) {
-          console.error('Error importing LRC file:', error)
-          alert(t('importError'))
-        }
-      }
-    }
-    input.click()
-  }
+
 
   const hasContent = lyrics.length > 0
   const hasAudio = audioFiles.main || audioFiles.instrumental || audioFiles.vocal
@@ -201,15 +165,7 @@ const ExportControls = () => {
             )}
           </button>
 
-          {/* Import LRC */}
-          <button
-            onClick={handleImportLRC}
-            className="flex items-center space-x-2 px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-all"
-            title={t('importLrcTooltip')}
-          >
-            <Upload size={16} />
-            <span>{t('importLrc')}</span>
-          </button>
+
         </div>
 
         {/* Export Info */}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { X, Plus } from 'lucide-react'
 import useLRCStore from '../stores/lrcStore'
 import { useTranslation } from '../i18n/translations'
@@ -66,33 +66,33 @@ const AddLyricModal = () => {
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content">
-        <div className="flex items-center justify-between mb-4">
+      <div className="modal-content max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl w-full mx-2 sm:mx-4">
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
           <div className="flex items-center space-x-2">
-            <Plus className="text-green-500" size={24} />
-            <h2 className="text-xl font-semibold text-gray-800">{t('addNewLine')}</h2>
+            <Plus className="text-green-500" size={20} />
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-800">{t('addNewLine')}</h2>
           </div>
           <button
             onClick={handleCancel}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-gray-400 hover:text-gray-600 transition-colors p-1"
           >
-            <X size={24} />
+            <X size={20} />
           </button>
         </div>
 
-        <div className="mb-4">
-          <p className="text-gray-600 text-sm mb-2">
+        <div className="mb-3 sm:mb-4">
+          <p className="text-gray-600 text-xs sm:text-sm mb-2">
             {t('enterLyricText')}
           </p>
         </div>
 
-        <div className="mb-6">
+        <div className="mb-4 sm:mb-6">
           <input
             type="text"
             value={lyricText}
             onChange={(e) => setLyricText(e.target.value)}
             placeholder={t('enterLyricPlaceholder')}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
             onKeyPress={(e) => {
               if (e.key === 'Enter') handleSubmit()
               if (e.key === 'Escape') handleCancel()
@@ -101,16 +101,16 @@ const AddLyricModal = () => {
           />
         </div>
 
-        <div className="flex justify-end space-x-3">
+        <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3">
           <button
             onClick={handleCancel}
-            className="btn-secondary"
+            className="btn-secondary text-sm sm:text-base px-3 sm:px-4 py-2"
           >
             {t('cancel')}
           </button>
           <button
             onClick={handleSubmit}
-            className="btn-primary"
+            className="btn-primary text-sm sm:text-base px-3 sm:px-4 py-2"
             disabled={!lyricText.trim()}
           >
             {t('addLine')}

@@ -100,8 +100,13 @@ export const generateLRCContent = (lyrics, metadata) => {
   // Add lyrics with timing
   lyrics.forEach(lyric => {
     if (lyric.startTime !== null) {
-      const timeString = formatLRCTime(lyric.startTime)
-      content += `[${timeString}]${lyric.text}\n`
+      const startString = formatLRCTime(lyric.startTime)
+      if (lyric.endTime !== null && lyric.endTime !== undefined) {
+        const endString = formatLRCTime(lyric.endTime)
+        content += `[${startString}-${endString}]${lyric.text}\n`
+      } else {
+        content += `[${startString}]${lyric.text}\n`
+      }
     }
   })
   
@@ -120,11 +125,9 @@ export const parseLRCContent = (content) => {
   const lines = content.split('\n')
   const metadata = {}
   const lyrics = []
-  
   lines.forEach(line => {
     line = line.trim()
     if (!line) return
-    
     // Check for metadata
     const metadataMatch = line.match(/^\[([a-z]+):(.+)\]$/)
     if (metadataMatch) {
@@ -132,13 +135,25 @@ export const parseLRCContent = (content) => {
       metadata[key] = value
       return
     }
-    
-    // Check for timed lyrics
+    // Check for [start-end] timed lyrics
+    const lyricRangeMatch = line.match(/^\[(\d{2}):(\d{2})\.(\d{2})-(\d{2}):(\d{2})\.(\d{2})\](.*)$/)
+    if (lyricRangeMatch) {
+      const [, sm, ss, sc, em, es, ec, text] = lyricRangeMatch
+      const startTime = parseInt(sm) * 60 + parseInt(ss) + parseInt(sc) / 100
+      const endTime = parseInt(em) * 60 + parseInt(es) + parseInt(ec) / 100
+      lyrics.push({
+        id: Date.now() + Math.random(),
+        text: text.trim(),
+        startTime,
+        endTime
+      })
+      return
+    }
+    // Check for [start] timed lyrics (legacy)
     const lyricMatch = line.match(/^\[(\d{2}):(\d{2})\.(\d{2})\](.*)$/)
     if (lyricMatch) {
       const [, minutes, seconds, centiseconds, text] = lyricMatch
       const time = parseInt(minutes) * 60 + parseInt(seconds) + parseInt(centiseconds) / 100
-      
       lyrics.push({
         id: Date.now() + Math.random(),
         text: text.trim(),
@@ -148,9 +163,11 @@ export const parseLRCContent = (content) => {
     }
   })
   
-  // Calculate end times
+  // Calculate end times only if not already set from LRC
   for (let i = 0; i < lyrics.length - 1; i++) {
-    lyrics[i].endTime = lyrics[i + 1].startTime
+    if (lyrics[i].endTime == null) {
+      lyrics[i].endTime = lyrics[i + 1].startTime
+    }
   }
   
   return { metadata, lyrics }

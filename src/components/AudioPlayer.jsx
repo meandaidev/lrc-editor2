@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { 
   Play, 
   Pause, 
   Volume2, 
   RotateCcw, 
-  Settings,
+  Info,
   Music,
   Mic,
   Headphones
@@ -52,7 +52,7 @@ const AudioPlayer = () => {
         URL.revokeObjectURL(mixedAudioUrl)
       }
     }
-  }, [audioFiles.instrumental, audioFiles.vocal])
+  }, [audioFiles.instrumental, audioFiles.vocal]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Create and manage audio URL
   useEffect(() => {
@@ -93,7 +93,7 @@ const AudioPlayer = () => {
         URL.revokeObjectURL(newUrl)
       }
     }
-  }, [audioFiles, activeAudioType, mixedAudioUrl])
+  }, [audioFiles, activeAudioType, mixedAudioUrl]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Set up audio reference
   useEffect(() => {
@@ -106,27 +106,33 @@ const AudioPlayer = () => {
   useEffect(() => {
     if (audioRef.current && currentAudioUrl) {
       const currentAudioRef = audioRef.current
-      const wasPlaying = !currentAudioRef.paused
-      const currentTimeValue = currentAudioRef.currentTime || 0
-      
-      currentAudioRef.pause() // This will trigger onPause event
+      // เก็บตำแหน่งล่าสุดไว้ก่อนเปลี่ยน src
+      const lastTime = currentAudioRef.currentTime || 0
+
+      currentAudioRef.pause()
       currentAudioRef.src = currentAudioUrl
-      
-      // Wait for audio to load before setting time and playing
-      const handleCanPlay = () => {
+
+      // รอให้ audio โหลดเสร็จแล้ว set currentTime กลับไปที่เดิม แล้วเล่นต่อถ้า isPlaying
+      const handleLoadedMetadata = () => {
         if (currentAudioRef) {
-          currentAudioRef.currentTime = currentTimeValue
-          if (wasPlaying) {
-            currentAudioRef.play().catch(console.error)
-          }
-          currentAudioRef.removeEventListener('canplay', handleCanPlay)
+          // ป้องกัน currentTime เกิน duration ใหม่
+          const safeTime = Math.min(lastTime, currentAudioRef.duration || lastTime)
+          console.log('[AudioPlayer] loadedmetadata:', { lastTime, duration: currentAudioRef.duration, before: currentAudioRef.currentTime });
+          currentAudioRef.currentTime = safeTime
+          setTimeout(() => {
+            console.log('[AudioPlayer] after set currentTime:', currentAudioRef.currentTime)
+            if (isPlaying) {
+              currentAudioRef.play().catch(console.error)
+            }
+          }, 0)
+          currentAudioRef.removeEventListener('loadedmetadata', handleLoadedMetadata)
         }
       }
-      
-      currentAudioRef.addEventListener('canplay', handleCanPlay)
+
+      currentAudioRef.addEventListener('loadedmetadata', handleLoadedMetadata)
       currentAudioRef.load()
     }
-  }, [currentAudioUrl])
+  }, [currentAudioUrl, isPlaying])
 
   const handleTimeUpdate = () => {
     if (audioRef.current) {
@@ -153,8 +159,8 @@ const AudioPlayer = () => {
   }
 
   const togglePlay = async () => {
-    console.log('togglePlay called, current state:', { isPlaying, audioSource: !!audioSource })
-    if (audioRef.current) {
+    console.log('togglePlay called, current state:', { isPlaying, hasCurrentAudioUrl: !!currentAudioUrl })
+    if (audioRef.current && currentAudioUrl) {
       if (isPlaying) {
         audioRef.current.pause()
         setIsPlaying(false)
@@ -170,7 +176,7 @@ const AudioPlayer = () => {
         }
       }
     } else {
-      console.error('audioRef.current is null')
+      console.error('audioRef.current is null or no audio URL available')
     }
   }
 
@@ -208,7 +214,7 @@ const AudioPlayer = () => {
   }
 
   return (
-    <div className="bg-white border-b border-gray-200 p-4">
+    <div className="bg-white border-b border-gray-200 p-2">
       <audio
         ref={audioRef}
         src={currentAudioUrl}
@@ -218,117 +224,124 @@ const AudioPlayer = () => {
         onPause={handlePause}
         onEnded={handleEnded}
         preload="metadata"
-      />
-
-      <div className="max-w-4xl mx-auto">
-        {/* Audio Type Selector */}
-        {canSwitchAudio && (
-          <div className="flex justify-center mb-4">
-            <div className="bg-gray-100 rounded-lg p-1 flex space-x-1">
-              <button
-                onClick={() => setActiveAudioType('mixed')}
-                className={`flex items-center space-x-1 px-3 py-1 rounded transition-all ${
-                  activeAudioType === 'mixed'
-                    ? 'bg-blue-500 text-white'
-                    : 'text-gray-600 hover:text-blue-500'
-                }`}
-              >
-                <Headphones size={16} />
-                <span className="text-sm">{t('mixed')}</span>
-              </button>
-              <button
-                onClick={() => setActiveAudioType('instrumental')}
-                className={`flex items-center space-x-1 px-3 py-1 rounded transition-all ${
-                  activeAudioType === 'instrumental'
-                    ? 'bg-blue-500 text-white'
-                    : 'text-gray-600 hover:text-blue-500'
-                }`}
-              >
-                <Music size={16} />
-                <span className="text-sm">{t('instrumental')}</span>
-              </button>
-              <button
-                onClick={() => setActiveAudioType('vocal')}
-                className={`flex items-center space-x-1 px-3 py-1 rounded transition-all ${
-                  activeAudioType === 'vocal'
-                    ? 'bg-blue-500 text-white'
-                    : 'text-gray-600 hover:text-blue-500'
-                }`}
-              >
-                <Mic size={16} />
-                <span className="text-sm">{t('vocal')}</span>
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Progress Bar */}
-        <div className="mb-4">
-          <div
-            className="progress-bar cursor-pointer"
-            onClick={handleSeek}
-          >
+      />      <div className="max-w-4xl mx-auto">
+        {/* Row 1: Progress Bar + Time Display */}
+        <div className="mb-1.5">
+          <div className="flex items-center gap-3">
+            {/* Time display */}
+            <span className="text-xs text-gray-500 font-mono w-12 text-center flex-shrink-0 bg-gray-50 rounded px-1 py-0.5">
+              {formatTime(currentTime)}
+            </span>
+            
+            {/* Progress bar */}
             <div
-              className="progress-fill"
-              style={{ width: duration ? `${(currentTime / duration) * 100}%` : '0%' }}
-            />
-          </div>
-          <div className="flex justify-between text-sm text-gray-500 mt-1">
-            <span className="time-display">{formatTime(currentTime)}</span>
-            <span className="time-display">{formatTime(duration)}</span>
+              className="progress-bar cursor-pointer flex-1 mx-1"
+              onClick={handleSeek}
+            >
+              <div
+                className="progress-fill"
+                style={{ width: duration ? `${(currentTime / duration) * 100}%` : '0%' }}
+              />
+            </div>
+            
+            {/* Duration */}
+            <span className="text-xs text-gray-500 font-mono w-12 text-center flex-shrink-0 bg-gray-50 rounded px-1 py-0.5">
+              {formatTime(duration)}
+            </span>
           </div>
         </div>
 
-        {/* Controls */}
-        <div className="flex items-center justify-center space-x-4">
-          <button
-            onClick={resetToStart}
-            className="p-2 text-gray-600 hover:text-blue-500 transition-colors"
-            title={t('resetToStart')}
-          >
-            <RotateCcw size={20} />
-          </button>
+        {/* Row 2: Audio Type Selector + Controls + Audio Info */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {/* Audio Type Selector (if available) */}
+            {canSwitchAudio && (
+              <div className="bg-gray-100 rounded-md p-0.5 flex gap-0.5 flex-shrink-0">
+                <button
+                  onClick={() => setActiveAudioType('mixed')}
+                  className={`flex items-center gap-1 px-1.5 py-1 rounded-sm transition-all text-xs font-medium ${
+                    activeAudioType === 'mixed'
+                      ? 'bg-blue-500 text-white shadow-sm'
+                      : 'text-gray-600 hover:text-blue-600 hover:bg-gray-200'
+                  }`}
+                >
+                  <Headphones size={11} />
+                  <span>Mix</span>
+                </button>
+                <button
+                  onClick={() => setActiveAudioType('vocal')}
+                  className={`flex items-center gap-1 px-1.5 py-1 rounded-sm transition-all text-xs font-medium ${
+                    activeAudioType === 'vocal'
+                      ? 'bg-blue-500 text-white shadow-sm'
+                      : 'text-gray-600 hover:text-blue-600 hover:bg-gray-200'
+                  }`}
+                >
+                  <Mic size={11} />
+                  <span>Vocal</span>
+                </button>
+                <button
+                  onClick={() => setActiveAudioType('instrumental')}
+                  className={`flex items-center gap-1 px-1.5 py-1 rounded-sm transition-all text-xs font-medium ${
+                    activeAudioType === 'instrumental'
+                      ? 'bg-blue-500 text-white shadow-sm'
+                      : 'text-gray-600 hover:text-blue-600 hover:bg-gray-200'
+                  }`}
+                >
+                  <Music size={11} />
+                  <span>Inst</span>
+                </button>
+              </div>
+            )}
 
-          <button
-            onClick={togglePlay}
-            className="p-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors"
-            title={t('playPause')}
-          >
-            {isPlaying ? <Pause size={24} /> : <Play size={24} />}
-          </button>
+            <button
+              onClick={resetToStart}
+              className="p-1.5 text-gray-600 hover:text-blue-500 hover:bg-blue-50 rounded transition-all"
+              title={t('resetToStart')}
+            >
+              <RotateCcw size={15} />
+            </button>
 
-          <div className="flex items-center space-x-2">
-            <Volume2 size={20} className="text-gray-600" />
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.1"
-              value={volume}
-              onChange={handleVolumeChange}
-              className="w-20"
-            />
+            <button
+              onClick={togglePlay}
+              className="p-2.5 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-all shadow-md hover:shadow-lg"
+              title={t('playPause')}
+            >
+              {isPlaying ? <Pause size={20} /> : <Play size={20} />}
+            </button>
+
+            <div className="flex items-center gap-1.5 bg-gray-50 rounded px-2 py-1">
+              <Volume2 size={13} className="text-gray-600" />
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.1"
+                value={volume}
+                onChange={handleVolumeChange}
+                className="w-14 h-1.5"
+              />
+            </div>
+
+            <button
+              onClick={() => setShowMetadataModal(true)}
+              className="p-3 text-blue-600 hover:text-white hover:bg-blue-500 bg-blue-100 rounded-full transition-all shadow-md hover:shadow-lg border-2 border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+              title={t('songMetadataTooltip')}
+            >
+              <Info size={26} />
+            </button>
           </div>
 
-          <button
-            onClick={() => setShowMetadataModal(true)}
-            className="p-2 text-gray-600 hover:text-blue-500 transition-colors"
-            title={t('songMetadataTooltip')}
-          >
-            <Settings size={20} />
-          </button>
-        </div>
-
-        {/* Current Audio Info */}
-        <div className="text-center mt-3">
-          <p className="text-xs text-gray-500">
-            {t('playingLabel')} {
-              activeAudioType === 'mixed' ? t('mixedAudio') :
-              activeAudioType === 'instrumental' ? t('instrumentalTrack') :
-              activeAudioType === 'vocal' ? t('vocalTrack') :
-              t('mainAudio')
-            }
-          </p>
+          {/* Current Audio Info - compact on the right */}
+          <div className="text-right">
+            <span className="text-xs text-gray-500 bg-gray-50 rounded px-2 py-1">
+              {t('playingLabel')} <span className="font-medium text-gray-700">{
+                activeAudioType === 'mixed' ? t('mixedAudio') :
+                activeAudioType === 'instrumental' ? t('instrumentalTrack') :
+                activeAudioType === 'vocal' ? t('vocalTrack') :
+                t('mainAudio')
+              }</span>
+            </span>
+          </div>
         </div>
       </div>
     </div>

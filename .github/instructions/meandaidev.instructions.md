@@ -1,7 +1,3 @@
----
-applyTo: '**'
----
-Coding standards, domain knowledge, and preferences that AI should follow.
 # การสนทนากับ AI
 ## ช่วยตอบเน้นภาษาไทยเป็นหลัก ผสมภาษาอังกฤษได้
 # ข้อกำหนดของ Project นี้
@@ -21,5 +17,4 @@ Coding standards, domain knowledge, and preferences that AI should follow.
 ## ใช้ React Testing Library สำหรับการทดสอบ UI
 ## ใช้ GitHub Actions สำหรับ CI/CD
 ## ใช้ Lucid-React สำหรับการจัดการ UI Components
-## Folder Demo ฉันจะเอาไว้เก็บ Demo project ที่เสร็จแล้วเอาไปเก็บไว้ (ฉันจะเป็นคนใช้งานเองคุณห้ามยุ่ง Folder นี้)
-## ถ้าจะเริ่มแก้ไขไฟล์ Source code ขนาดใหญ่ (1000+ บรรทัด) ให้สำรองไฟล์นั้นก่อน
+## ถ้าแก้ไขไฟล์แล้วเจอปัญหาไฟล์พังให้บอกน่ะเดี๋ยวช่วยกันเอากลับจาก VSCode Open Timeline

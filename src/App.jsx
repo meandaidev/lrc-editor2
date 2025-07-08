@@ -10,11 +10,10 @@ import LyricsTable from './components/LyricsTable'
 import AddLyricModal from './components/AddLyricModal'
 import MetadataModal from './components/MetadataModal'
 import ExportControls from './components/ExportControls'
-
 function App() {
-  const { audioFiles, lyrics } = useLRCStore()
+  const { audioFiles, lyrics, skipLyricsInputModalOnce } = useLRCStore()
   const { t } = useTranslation()
-  
+
   const hasAudioFiles = audioFiles.main || audioFiles.instrumental || audioFiles.vocal
   const hasLyrics = lyrics.length > 0
 
@@ -22,7 +21,7 @@ function App() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <Header />
-      
+
       {/* Main Content */}
       {!hasAudioFiles ? (
         /* Step 1: File Upload */
@@ -32,14 +31,14 @@ function App() {
         <div className="flex flex-col min-h-screen">
           {/* Audio Player - Fixed at top */}
           <AudioPlayer />
-          
+
           {/* Main Content Area */}
           <div className="flex-1 overflow-auto">
-            {hasLyrics ? (
-              /* Lyrics Table */
+            {(hasLyrics || skipLyricsInputModalOnce) ? (
+              /* Lyrics Table (normal or add-line-by-line mode) */
               <LyricsTable />
             ) : (
-              /* No lyrics message */
+              /* No lyrics message (default) */
               <div className="max-w-4xl mx-auto p-6">
                 <div className="text-center py-12 bg-white rounded-lg shadow-sm">
                   <h3 className="text-lg font-semibold text-gray-700 mb-2">
@@ -58,7 +57,6 @@ function App() {
               </div>
             )}
           </div>
-          
           {/* Export Controls - Fixed at bottom when lyrics exist */}
           {hasLyrics && <ExportControls />}
         </div>
@@ -68,9 +66,10 @@ function App() {
       <LyricsInput />
       <AddLyricModal />
       <MetadataModal />
-      
+
       {/* Footer */}
       <Footer />
+
     </div>
   )
 }

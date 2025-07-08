@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { X, Settings, Save } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { X, Info, Save } from 'lucide-react'
 import useLRCStore from '../stores/lrcStore'
 import { useTranslation } from '../i18n/translations'
 
@@ -46,23 +46,23 @@ const MetadataModal = () => {
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content max-w-lg">
-        <div className="flex items-center justify-between mb-6">
+      <div className="modal-content max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl w-full mx-2 sm:mx-4 max-h-[90vh] flex flex-col">
+        <div className="flex items-center justify-between mb-4 sm:mb-6 flex-shrink-0">
           <div className="flex items-center space-x-2">
-            <Settings className="text-blue-500" size={24} />
-            <h2 className="text-xl font-semibold text-gray-800">{t('songMetadata')}</h2>
+            <Info className="text-blue-500" size={20} />
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-800">{t('songMetadata')}</h2>
           </div>
           <button
             onClick={handleCancel}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-gray-400 hover:text-gray-600 transition-colors p-1"
           >
-            <X size={24} />
+            <X size={20} />
           </button>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4 overflow-y-auto flex-1 min-h-0">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
               {t('title')}
             </label>
             <input
@@ -70,12 +70,12 @@ const MetadataModal = () => {
               value={formData.title || ''}
               onChange={(e) => handleChange('title', e.target.value)}
               placeholder={t('title')}
-              className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full p-2 sm:p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
               {t('artist')}
             </label>
             <input
@@ -83,12 +83,12 @@ const MetadataModal = () => {
               value={formData.artist || ''}
               onChange={(e) => handleChange('artist', e.target.value)}
               placeholder={t('artist')}
-              className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full p-2 sm:p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
               {t('album')}
             </label>
             <input
@@ -96,12 +96,12 @@ const MetadataModal = () => {
               value={formData.album || ''}
               onChange={(e) => handleChange('album', e.target.value)}
               placeholder={t('album')}
-              className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full p-2 sm:p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
               {t('author')}
             </label>
             <input
@@ -109,12 +109,12 @@ const MetadataModal = () => {
               value={formData.author || ''}
               onChange={(e) => handleChange('author', e.target.value)}
               placeholder={t('author')}
-              className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full p-2 sm:p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
               {t('length')}
             </label>
             <input
@@ -122,12 +122,12 @@ const MetadataModal = () => {
               value={formData.length || ''}
               onChange={(e) => handleChange('length', e.target.value)}
               placeholder="4:15"
-              className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full p-2 sm:p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
               {t('lrcCreator')}
             </label>
             <input
@@ -135,12 +135,12 @@ const MetadataModal = () => {
               value={formData.by || ''}
               onChange={(e) => handleChange('by', e.target.value)}
               placeholder={t('lrcCreator')}
-              className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full p-2 sm:p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
               {t('offset')}
             </label>
             <input
@@ -148,7 +148,7 @@ const MetadataModal = () => {
               value={formData.offset || 0}
               onChange={(e) => handleChange('offset', parseInt(e.target.value) || 0)}
               placeholder="0"
-              className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full p-2 sm:p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
             />
             <p className="text-xs text-gray-500 mt-1">
               {t('offsetNote')}
@@ -156,18 +156,18 @@ const MetadataModal = () => {
           </div>
         </div>
 
-        <div className="flex justify-end space-x-3 mt-6">
+        <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 mt-4 sm:mt-6 flex-shrink-0">
           <button
             onClick={handleCancel}
-            className="btn-secondary"
+            className="btn-secondary text-sm sm:text-base px-3 sm:px-4 py-2"
           >
             {t('cancel')}
           </button>
           <button
             onClick={handleSave}
-            className="btn-primary flex items-center space-x-2"
+            className="btn-primary flex items-center justify-center space-x-2 text-sm sm:text-base px-3 sm:px-4 py-2"
           >
-            <Save size={16} />
+            <Save size={14} />
             <span>{t('saveMetadata')}</span>
           </button>
         </div>

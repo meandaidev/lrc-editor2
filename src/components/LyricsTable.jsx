@@ -1,6 +1,5 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { 
-  Play, 
   Clock, 
   Plus, 
   Minus, 
@@ -21,14 +20,17 @@ const LyricsTable = () => {
     lyrics,
     currentLyricIndex,
     currentTime,
+    isPlaying,
+    audioRef,
     setLyricTime,
     adjustLyricTime,
     deleteLyric,
     updateLyric,
-    playFromLyric,
     jumpToLine,
     setShowAddLyricModal,
-    setAddLyricIndex
+    setAddLyricIndex,
+    setIsPlaying,
+    skipLyricsInputModalOnce
   } = useLRCStore()
 
   const handleSetStartTime = (lyricId) => {
@@ -62,8 +64,64 @@ const LyricsTable = () => {
   }
 
   const handleAddLyric = (index) => {
-    setAddLyricIndex(index)
-    setShowAddLyricModal(true)
+    console.log('handleAddLyric called, isPlaying:', isPlaying)
+    console.log('audioRef:', audioRef)
+    console.log('audioRef available:', !!audioRef)
+    
+    // Function to wait for audioRef to be ready
+    const waitForAudioRef = (callback, maxAttempts = 10) => {
+      let attempts = 0
+      
+      const checkAudioRef = () => {
+        attempts++
+        console.log(`Attempt ${attempts}: checking audioRef...`, !!audioRef)
+        
+        if (audioRef) {
+          console.log('audioRef is ready, executing callback')
+          callback()
+        } else if (attempts < maxAttempts) {
+          console.log(`audioRef not ready, retrying in 50ms (attempt ${attempts}/${maxAttempts})`)
+          setTimeout(checkAudioRef, 50)
+        } else {
+          console.log('Max attempts reached, proceeding without audioRef')
+          callback()
+        }
+      }
+      
+      checkAudioRef()
+    }
+    
+    const executeAddLyric = () => {
+      const hasAudioRef = !!audioRef
+      const audioIsPlaying = hasAudioRef && !audioRef.paused
+      const stateIsPlaying = isPlaying
+      const wasPlaying = (stateIsPlaying || audioIsPlaying) && hasAudioRef
+      
+      console.log('Conditions - hasAudioRef:', hasAudioRef, 'audioIsPlaying:', audioIsPlaying, 'stateIsPlaying:', stateIsPlaying, 'wasPlaying:', wasPlaying)
+      
+      // Pause audio if playing before opening modal
+      if (wasPlaying) {
+        console.log('Pausing audio before opening add lyric modal')
+        audioRef.pause()
+        setIsPlaying(false)
+        localStorage.setItem('wasPlayingBeforeModal', 'true')
+        console.log('Set localStorage wasPlayingBeforeModal to true')
+      } else {
+        localStorage.removeItem('wasPlayingBeforeModal')
+        console.log('Removed localStorage wasPlayingBeforeModal')
+      }
+      
+      setAddLyricIndex(index)
+      setShowAddLyricModal(true)
+    }
+    
+    // If we're playing but don't have audioRef yet, wait for it
+    if (isPlaying && !audioRef) {
+      console.log('Audio is playing but audioRef not ready, waiting...')
+      waitForAudioRef(executeAddLyric)
+    } else {
+      executeAddLyric()
+    }
   }
 
   const handleJumpToLine = (index) => {
@@ -77,6 +135,21 @@ const LyricsTable = () => {
           <Clock className="mx-auto text-gray-400 mb-4" size={48} />
           <h3 className="text-lg font-semibold text-gray-700 mb-2">{t('noLyricsTitle')}</h3>
           <p className="text-gray-500">{t('noLyricsSubtitle')}</p>
+          {skipLyricsInputModalOnce && (
+            <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4 inline-block">
+              <span className="text-blue-800 text-sm font-medium">{t('addLineByLineMode')}</span>
+              <div className="text-blue-700 text-xs mt-1">{t('addLineByLineHint')}</div>
+            </div>
+          )}
+          <div className="mt-6">
+            <button
+              onClick={() => handleAddLyric(-1)}
+              className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 hover:text-gray-900 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+              <Plus size={14} />
+              <span>{t('addLineBottom')}</span>
+            </button>
+          </div>
         </div>
       </div>
     )
@@ -84,13 +157,19 @@ const LyricsTable = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      {/* Add Lyric Button - Top */}
+      {/* Add Lyric Button - Top & AddLineByLine UX */}
       <div className="mb-4 text-center">
+        {skipLyricsInputModalOnce && lyrics.length === 0 && (
+          <div className="mb-2 bg-blue-50 border border-blue-200 rounded-lg p-2 inline-block">
+            <span className="text-blue-800 text-xs font-medium">{t('addLineByLineMode')}</span>
+            <div className="text-blue-700 text-xs">{t('addLineByLineHint')}</div>
+          </div>
+        )}
         <button
           onClick={() => handleAddLyric(-1)}
-          className="btn-primary flex items-center space-x-2"
+          className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 hover:text-gray-900 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
-          <Plus size={16} />
+          <Plus size={14} />
           <span>{t('addLineBottom')}</span>
         </button>
       </div>
@@ -114,8 +193,7 @@ const LyricsTable = () => {
                 key={lyric.id}
                 className={`${
                   currentLyricIndex === index ? 'lyrics-active' : ''
-                } cursor-pointer`}
-                onClick={() => playFromLyric(lyric.id)}
+                }`}
               >
                 {/* Line Number */}
                 <td className="text-center font-mono text-sm text-gray-500">
@@ -310,9 +388,9 @@ const LyricsTable = () => {
       <div className="mt-4 text-center">
         <button
           onClick={() => handleAddLyric(-1)}
-          className="btn-primary flex items-center space-x-2"
+          className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 hover:text-gray-900 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
-          <Plus size={16} />
+          <Plus size={14} />
           <span>{t('addLineBottom')}</span>
         </button>
       </div>
