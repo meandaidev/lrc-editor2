@@ -1,0 +1,137 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Smooth transitions */
+* {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Audio player custom styles */
+audio::-webkit-media-controls-panel {
+  background-color: #f3f4f6;
+}
+
+/* Drag and drop styles */
+.drag-over {
+  border-color: #3b82f6 !important;
+  background-color: rgba(59, 130, 246, 0.05) !important;
+}
+
+/* Active lyrics highlight */
+.lyrics-active {
+  background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%) !important;
+  color: white !important;
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.4);
+}
+
+.lyrics-active * {
+  color: white !important;
+  font-weight: 500 !important;
+}
+
+.lyrics-active .time-display {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.lyrics-active .btn-primary {
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: #1e40af !important;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.lyrics-active .btn-secondary {
+  background: rgba(255, 255, 255, 0.8) !important;
+  color: #374151 !important;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.lyrics-active .btn-primary:hover {
+  background: rgba(255, 255, 255, 1) !important;
+  color: #1e40af !important;
+}
+
+.lyrics-active .btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: #374151 !important;
+}
+
+/* Button hover effects */
+.btn-primary {
+  @apply bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-all duration-200 transform hover:scale-105;
+}
+
+.btn-secondary {
+  @apply bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg transition-all duration-200;
+}
+
+.btn-danger {
+  @apply bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded transition-all duration-200;
+}
+
+/* Table styles */
+.lyrics-table {
+  @apply w-full border-collapse;
+}
+
+.lyrics-table th {
+  @apply bg-gray-100 p-3 text-left font-medium text-gray-700 border-b;
+}
+
+.lyrics-table td {
+  @apply p-3 border-b border-gray-200 transition-all duration-200;
+}
+
+.lyrics-table tr:hover {
+  @apply bg-gray-50;
+}
+
+/* Modal styles */
+.modal-overlay {
+  @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+}
+
+.modal-content {
+  @apply bg-white rounded-lg p-6 max-w-md w-full mx-4 transform transition-all duration-200;
+}
+
+/* File upload area */
+.file-upload-area {
+  @apply border-2 border-dashed border-gray-300 rounded-lg p-8 text-center transition-all duration-200 hover:border-blue-400 hover:bg-blue-50;
+}
+
+/* Time display */
+.time-display {
+  @apply font-mono text-sm bg-gray-100 px-2 py-1 rounded;
+}
+
+/* Progress bar */
+.progress-bar {
+  @apply w-full h-2 bg-gray-200 rounded-full overflow-hidden;
+}
+
+.progress-fill {
+  @apply h-full bg-blue-500 transition-all duration-100 ease-linear;
+}
